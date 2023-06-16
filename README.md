@@ -1,2 +1,2 @@
 # puzzles
-This is puzzle game 
+This is a puzzle game 
