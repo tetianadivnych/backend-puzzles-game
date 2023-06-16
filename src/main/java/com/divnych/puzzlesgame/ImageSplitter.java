@@ -7,6 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,9 +58,18 @@ public class ImageSplitter {
         }
 
         List<File> puzzles = new ArrayList<>();
+
+        //create directory to store files
+        String outputDirectory = "./puzzles/"; // Relative path to the subimages folder
+
+        Path directoryPath = Paths.get(outputDirectory);
+        if (!Files.exists(directoryPath)) {
+            Files.createDirectories(directoryPath);
+        }
+
         //writing sub-images into image files
         for (int i = 0; i < 16; i++) {
-            File outputFile = new File("img" + i + ".jpg");
+            File outputFile = new File( outputDirectory +"img" + i + ".jpg");
             ImageIO.write(imgs[i], "jpg", outputFile);
             puzzles.add(outputFile);
         }
