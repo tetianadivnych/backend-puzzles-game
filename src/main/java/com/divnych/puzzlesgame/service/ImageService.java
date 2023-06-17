@@ -1,4 +1,6 @@
-package com.divnych.puzzlesgame;
+package com.divnych.puzzlesgame.service;
+
+import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
@@ -13,15 +15,15 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImageSplitter {
+@Service
+public class ImageService {
 
-    public static List<File> split() throws IOException {
+    public List<File> split(URL imageUrl) throws IOException {
         // Setting Chrome as an agent
         System.setProperty("http.agent", "Chrome");
 
         // reading the file from a URL
-        URL url = new URL("https://i.imgur.com/EfVO4jw.jpeg");
-        InputStream is = url.openStream();
+        InputStream is = imageUrl.openStream();
         BufferedImage image = ImageIO.read(is);
 
         // initalizing rows and columns
@@ -29,7 +31,7 @@ public class ImageSplitter {
         int columns = 4;
 
         // initializing array to hold subimages
-        BufferedImage imgs[] = new BufferedImage[16];
+        BufferedImage[] imgs = new BufferedImage[16];
 
         // Equally dividing original image into subimages
         int subimage_Width = image.getWidth() / columns;
@@ -69,7 +71,7 @@ public class ImageSplitter {
 
         //writing sub-images into image files
         for (int i = 0; i < 16; i++) {
-            File outputFile = new File( outputDirectory +"img" + i + ".jpg");
+            File outputFile = new File(outputDirectory + "img" + i + ".jpg");
             ImageIO.write(imgs[i], "jpg", outputFile);
             puzzles.add(outputFile);
         }
