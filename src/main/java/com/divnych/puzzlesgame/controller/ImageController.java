@@ -29,10 +29,15 @@ public class ImageController {
         String stringUrl = request.getImageUrl();
         URL url = new URL(stringUrl);
         List<File> imageFiles = imageService.split(url);
-        return imageFiles.stream().map(file -> ImageConverter.convertFile(file)).collect(Collectors.toList());
+        return imageFiles.stream()
+                .map(file -> ImageConverter.convertFiletoString(file))
+                .collect(Collectors.toList());
     }
 
-
+    @PostMapping("/verify")
+    public boolean verify(@RequestBody List<String> puzzles) {
+        return imageService.verify(puzzles);
+    }
 
 }
 
