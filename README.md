@@ -1,2 +1,2 @@
-# puzzle-game
-This is a puzzle game!
+# puzzles-game
+This is the puzzles game!
