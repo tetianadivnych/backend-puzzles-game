@@ -8,6 +8,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ImageConverter {
     public static String convertFiletoString(File file) {
@@ -18,6 +20,12 @@ public class ImageConverter {
             throw new RuntimeException(e);
         }
         return Base64.getEncoder().encodeToString(fileContent);
+    }
+
+    public static List<String> convertFilesToStrings(List<File> files) {
+        return files.stream()
+                .map(file -> convertFiletoString(file))
+                .collect(Collectors.toList());
     }
 
     public static BufferedImage convertString(String encodedString)  {

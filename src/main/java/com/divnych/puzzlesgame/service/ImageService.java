@@ -1,6 +1,7 @@
 package com.divnych.puzzlesgame.service;
 
 import com.divnych.puzzlesgame.converter.ImageConverter;
+import com.divnych.puzzlesgame.playload.ImageUrlRequest;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -113,4 +114,10 @@ public class ImageService {
     }
 
 
+    public List<String> getEncodedImages(ImageUrlRequest request) throws IOException {
+            String stringUrl = request.getImageUrl();
+            URL url = new URL(stringUrl);
+            List<File> imageFiles = split(url);
+            return ImageConverter.convertFilesToStrings(imageFiles);
+    }
 }
