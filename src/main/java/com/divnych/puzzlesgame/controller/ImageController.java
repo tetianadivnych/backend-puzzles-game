@@ -19,7 +19,7 @@ public class ImageController {
     }
 
     @PostMapping("/split")
-    public List<String> split(@RequestBody ImageUrlRequest request) throws IOException {
+    public List<Integer> split(@RequestBody ImageUrlRequest request) throws IOException {
         return imageService.getEncodedImages(request);
     }
 
