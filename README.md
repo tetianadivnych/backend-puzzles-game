@@ -2,7 +2,7 @@
 This is the Java backend part of a project which generates puzzles and enables users to assemble them manually. 
 The application can also check if the assembled puzzles match an original picture. 
 
-When this server is up, launch [the frontend part](https://github.com/tetianadivnych/frontend-puzzles-game/tree/main).
+When this server is up, launch [the frontend](https://github.com/tetianadivnych/frontend-puzzles-game/tree/main).
 
 ## Prerequisites
 Java JDK version 11 should be installed in the system.
