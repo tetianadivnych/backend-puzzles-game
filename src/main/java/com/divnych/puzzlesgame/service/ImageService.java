@@ -84,8 +84,8 @@ public class ImageService {
 
     public boolean verify(List<String> puzzles) {
         File[] files = new File("./puzzles").listFiles();
-        File[] sortedArray = Arrays.asList(files).stream()
-                .sorted(Comparator.comparing(file -> {
+        File[] sortedArray = Arrays.asList(files)
+                .stream().sorted(Comparator.comparing(file -> {
                     Pattern pattern = Pattern.compile("\\d+");
                     Matcher matcher = pattern.matcher(file.getName());
                     return matcher.find() ? Integer.parseInt(matcher.group()) : -1;
@@ -113,7 +113,6 @@ public class ImageService {
         return ((DataBufferByte) bufferedFile.getRaster().getDataBuffer()).getData();
     }
 
-
     public List<String> getEncodedImages(ImageUrlRequest request) {
         String stringUrl = request.getImageUrl();
         URL url;
@@ -125,4 +124,5 @@ public class ImageService {
         List<File> imageFiles = split(url);
         return ImageConverter.convertFilesToStrings(imageFiles);
     }
+
 }

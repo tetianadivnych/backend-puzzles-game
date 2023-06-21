@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ImageConverter {
+
     public static String convertFiletoString(File file) {
         byte[] fileContent;
         try {
@@ -28,7 +29,7 @@ public class ImageConverter {
                 .collect(Collectors.toList());
     }
 
-    public static BufferedImage convertString(String encodedString)  {
+    public static BufferedImage convertString(String encodedString) {
         byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
         try {
             return ImageIO.read(new ByteArrayInputStream(decodedBytes));
@@ -44,4 +45,5 @@ public class ImageConverter {
             throw new RuntimeException(e);
         }
     }
+
 }

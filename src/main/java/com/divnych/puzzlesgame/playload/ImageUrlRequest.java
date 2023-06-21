@@ -8,4 +8,5 @@ import lombok.Setter;
 public class ImageUrlRequest {
 
     private String imageUrl;
+
 }
