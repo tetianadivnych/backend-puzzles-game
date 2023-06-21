@@ -4,7 +4,6 @@ import com.divnych.puzzlesgame.playload.ImageUrlRequest;
 import com.divnych.puzzlesgame.service.ImageService;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -19,7 +18,7 @@ public class ImageController {
     }
 
     @PostMapping("/split")
-    public List<String> split(@RequestBody ImageUrlRequest request) throws IOException {
+    public List<String> split(@RequestBody ImageUrlRequest request) {
         return imageService.getEncodedImages(request);
     }
 
