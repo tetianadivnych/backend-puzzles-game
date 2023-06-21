@@ -25,7 +25,7 @@ public class ImageServiceTest {
     void testSplit() throws Exception {
         URL imageUrl = new URL("https://i.imgur.com/EfVO4jw.jpeg");
         List<File> puzzles = imageService.split(imageUrl);
-        assertEquals(4, puzzles.size());
+        assertEquals(16, puzzles.size());
 
         for (File file : puzzles) {
             Assertions.assertTrue(file.exists());

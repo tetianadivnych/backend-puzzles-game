@@ -5,7 +5,7 @@ import com.divnych.puzzlesgame.playload.ImageUrlRequest;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
@@ -17,7 +17,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class ImageService {
@@ -31,8 +34,8 @@ public class ImageService {
         BufferedImage image = ImageIO.read(is);
 
         // initalizing rows and columns
-        int rows = 2;
-        int columns = 2;
+        int rows = 4;
+        int columns = 4;
 
         // initializing array to hold subimages
         BufferedImage[] imgs = new BufferedImage[16];
@@ -74,7 +77,7 @@ public class ImageService {
         }
 
         //writing sub-images into image files
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 16; i++) {
             File outputFile = new File(outputDirectory + "img" + i + ".jpg");
             ImageIO.write(imgs[i], "jpg", outputFile);
             puzzles.add(outputFile);
@@ -85,8 +88,14 @@ public class ImageService {
 
     public boolean verify(List<String> puzzles) {
         File[] files = new File("./puzzles").listFiles();
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
+        File[] sortedArray = Arrays.asList(files).stream()
+                .sorted(Comparator.comparing(file -> {
+                    Pattern pattern = Pattern.compile("\\d+");
+                    Matcher matcher = pattern.matcher(file.getName());
+                    return matcher.find() ? Integer.parseInt(matcher.group()) : -1;
+                })).toArray(File[]::new);
+        for (int i = 0; i < sortedArray.length; i++) {
+            File file = sortedArray[i];
             String stringPuzzle = puzzles.get(i);
             boolean equal = isEqual(stringPuzzle, file);
             if (!equal) {
