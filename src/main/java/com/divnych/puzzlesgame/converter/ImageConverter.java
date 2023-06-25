@@ -57,7 +57,7 @@ public class ImageConverter {
 
     public static List<File> convertBufferedImagesToFiles(BufferedImage[] bufferedImages, String imagesDirectory) {
         List<File> puzzleFiles = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < bufferedImages.length; i++) {
             File outputFile = new File(imagesDirectory + "img" + i + ".jpg");
             try {
                 ImageIO.write(bufferedImages[i], "jpg", outputFile);

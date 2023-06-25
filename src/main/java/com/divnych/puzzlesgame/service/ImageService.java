@@ -1,12 +1,15 @@
 package com.divnych.puzzlesgame.service;
 
 import com.divnych.puzzlesgame.converter.ImageConverter;
-import com.divnych.puzzlesgame.exceptions.*;
+import com.divnych.puzzlesgame.exceptions.FailedToCreateDirectoryException;
+import com.divnych.puzzlesgame.exceptions.FailedToOpenStreamException;
+import com.divnych.puzzlesgame.exceptions.FailedToReadImageException;
+import com.divnych.puzzlesgame.exceptions.InvalidImageUrlException;
 import com.divnych.puzzlesgame.playload.ImageUrlRequest;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
@@ -47,9 +50,9 @@ public class ImageService implements CommandLineRunner {
         } catch (IOException e) {
             throw new FailedToReadImageException("Cannot read input image");
         }
-        int rows = 2;
-        int columns = 2;
-        BufferedImage[] puzzleImages = new BufferedImage[4];
+        int rows = 3;
+        int columns = 3;
+        BufferedImage[] puzzleImages = new BufferedImage[rows*columns];
         int width = inputImage.getWidth() / columns;
         int height = inputImage.getHeight() / rows;
         int currentImage = 0;
@@ -228,6 +231,9 @@ public class ImageService implements CommandLineRunner {
     *
     * */
 
+
+
+
     private static List<Mat> assembleImagePieces(List<Mat> imagePieces) {
         List<Mat> assembledPieces = new ArrayList<>();
 
@@ -241,9 +247,16 @@ public class ImageService implements CommandLineRunner {
             Mat bestMatch = null;
             double bestMatchScore = Double.MAX_VALUE;
 
+            // Get the border pixels from the previous piece
+            Mat previousBorderPixels = extractBorderPixels(previousPiece, BorderType.RIGHT);
+
             // Iterate over the remaining image pieces to find the best matching piece
             for (Mat currentPiece : imagePieces) {
-                double score = calculateMatchingScore(previousPiece, currentPiece);
+                // Get the border pixels from the current piece
+                Mat currentBorderPixels = extractBorderPixels(currentPiece, BorderType.LEFT);
+
+                // Calculate the similarity score for the border pixels
+                double score = calculateMatchingScore(previousBorderPixels, currentBorderPixels);
 
                 if (score < bestMatchScore) {
                     bestMatchScore = score;
@@ -263,38 +276,44 @@ public class ImageService implements CommandLineRunner {
         return assembledPieces;
     }
 
-    private static double calculateMatchingScore(Mat image1, Mat image2) {
-        // Convert images to grayscale
-        Mat grayImage1 = new Mat();
-        Mat grayImage2 = new Mat();
-        Imgproc.cvtColor(image1, grayImage1, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.cvtColor(image2, grayImage2, Imgproc.COLOR_BGR2GRAY);
+    private static Mat extractBorderPixels(Mat image, BorderType borderType) {
+        int rows = image.rows();
+        int cols = image.cols();
+        int borderSize = 1; // Number of pixels on the border to extract
 
-        // Apply Canny edge detection
-        Mat edges1 = new Mat();
-        Mat edges2 = new Mat();
-        Imgproc.Canny(grayImage1, edges1, 50, 150);
-        Imgproc.Canny(grayImage2, edges2, 50, 150);
+        // Extract the border pixels based on the border type
+        Mat borderPixels = new Mat();
+        if (borderType == BorderType.LEFT) {
+            borderPixels = new Mat(image, new Rect(0, 0, borderSize, rows));
+        } else if (borderType == BorderType.RIGHT) {
+            borderPixels = new Mat(image, new Rect(cols - borderSize, 0, borderSize, rows));
+        }
 
-        // Calculate the SSD (Sum of Squared Differences) score
-
-        return calculateSSDScore(edges1, edges2);
+        return borderPixels;
     }
 
-    private static double calculateSSDScore(Mat image1, Mat image2) {
-        int totalPixels = image1.rows() * image1.cols();
+    private static double calculateMatchingScore(Mat borderPixels1, Mat borderPixels2) {
+        int totalPixels = borderPixels1.rows() * borderPixels1.cols();
 
         double sumSquaredDiff = 0;
-        for (int row = 0; row < image1.rows(); row++) {
-            for (int col = 0; col < image1.cols(); col++) {
-                double diff = image1.get(row, col)[0] - image2.get(row, col)[0];
+        for (int row = 0; row < borderPixels1.rows(); row++) {
+            for (int col = 0; col < borderPixels1.cols(); col++) {
+                double diff = borderPixels1.get(row, col)[0] - borderPixels2.get(row, col)[0];
                 sumSquaredDiff += Math.pow(diff, 2);
             }
         }
 
         return sumSquaredDiff / totalPixels;
     }
-/*
+
+    enum BorderType {
+        LEFT,
+        RIGHT
+    }
+
+
+
+    /*
 *
 * Final Step.
 *
@@ -316,7 +335,5 @@ public class ImageService implements CommandLineRunner {
     public void run(String... args) throws Exception {
         List<BufferedImage> piecesOrderedByOpenCV = getPiecesOrderedByOpenCV();
         saveAssembledImagesToDirectory(piecesOrderedByOpenCV);
-/*        URL url = new URL("https://i.imgur.com/EfVO4jw.jpeg");
-        List<File> fileList = split(url);*/
     }
 }
