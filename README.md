@@ -1,5 +1,5 @@
 # Description
-This is the Java backend part of a project which generates puzzles and enables users to assemble them manually. 
+This is the Java backend part of a project which generates puzzles and enables users to assemble them. 
 The application can also check if the assembled puzzles match an original picture. 
 
 When this server is up, launch [the frontend](https://github.com/tetianadivnych/frontend-puzzles-game/tree/main) part.
@@ -7,8 +7,11 @@ When this server is up, launch [the frontend](https://github.com/tetianadivnych/
 ## Prerequisites
 Java JDK version 11 should be installed in the system.
 
-You can download Java from here https://www.oracle.com/java/technologies/downloads/#java11
-or here https://adoptium.net/temurin/releases/
+You can [download Java from here](https://www.oracle.com/java/technologies/downloads/#java11)
+or [here](https://adoptium.net/temurin/releases/).
+
+This app uses the OpenCV library so you'd need to install it locally on your computer and configure any required connection.
+You can [download the library (OpenCV – 4.6.0) from the official website](https://opencv.org/releases/). 
 
 ## How to Build
   
