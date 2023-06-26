@@ -48,6 +48,4 @@ docker run -p 8080:8080 backend-puzzles-game
 Detailed instruction on Docker setup is available [here](https://docs.docker.com/get-started/02_our_app/).
 
 ## How to access CI Pipeline 
-[![java-maven](https://github.com/tetianadivnych/backend-puzzles-game/actions/workflows/maven.yml/badge.svg)](https://github.com/tetianadivnych/backend-puzzles-game/actions/workflows/maven.yml)
-
 The project contains a maven.yml file to enable continuous integration. Click the badge above to see project build workflow statuses.
