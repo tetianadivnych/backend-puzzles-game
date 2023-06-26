@@ -50,8 +50,8 @@ public class ImageService implements CommandLineRunner {
         } catch (IOException e) {
             throw new FailedToReadImageException("Cannot read input image");
         }
-        int rows = 3;
-        int columns = 3;
+        int rows = 4;
+        int columns = 4;
         BufferedImage[] puzzleImages = new BufferedImage[rows*columns];
         int width = inputImage.getWidth() / columns;
         int height = inputImage.getHeight() / rows;
@@ -202,37 +202,18 @@ public class ImageService implements CommandLineRunner {
         System.out.println("the list of image files have been created");
     }
 
-
-
-/*    Step 0. Read images by OpenCV */
-
-
     private static List<Mat> loadAndPreprocessImages(File[] puzzleFiles) {
         List<Mat> imagePieces = new ArrayList<>();
         if (puzzleFiles != null) {
             for (File puzzleFile : puzzleFiles) {
                 if (puzzleFile.isFile() && puzzleFile.getName().endsWith(".jpg")) {
                     Mat image = Imgcodecs.imread(puzzleFile.getAbsolutePath());
-                    // Perform any necessary preprocessing on the image (e.g., resize, grayscale, etc.)
-                    // ...
                     imagePieces.add(image);
                 }
             }
         }
-
         return imagePieces;
     }
-
-    /*
-    *
-    *
-    * Step 1. Determine the sequence of image pieces based on edge matching.
-    *
-    *
-    * */
-
-
-
 
     private static List<Mat> assembleImagePieces(List<Mat> imagePieces) {
         List<Mat> assembledPieces = new ArrayList<>();
@@ -310,14 +291,6 @@ public class ImageService implements CommandLineRunner {
         LEFT,
         RIGHT
     }
-
-
-
-    /*
-*
-* Final Step.
-*
-* */
 
     private static Mat mergeImagePieces(List<Mat> assembledPieces) {
         // Implement the image merging logic here
