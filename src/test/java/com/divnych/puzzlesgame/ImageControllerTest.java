@@ -72,7 +72,7 @@ public class ImageControllerTest {
         return mvcResult;
     }
 
-    private static String convertImageFilesToStrings(MvcResult mvcResult) {
+    private String convertImageFilesToStrings(MvcResult mvcResult) {
         String responseBody;
         try {
             responseBody = mvcResult.getResponse().getContentAsString();
@@ -82,7 +82,7 @@ public class ImageControllerTest {
         return responseBody;
     }
 
-    private static List<String> readStrings(ObjectMapper objectMapper, String responseBody) {
+    private List<String> readStrings(ObjectMapper objectMapper, String responseBody) {
         List<String> actualResult;
         try {
             actualResult = objectMapper.readValue(responseBody, List.class);
