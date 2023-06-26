@@ -127,49 +127,6 @@ public class ImageService implements CommandLineRunner {
         return ImageConverter.convertFilesToStrings(imageFiles);
     }
 
-    /*
-    *
-    * Core method
-    *
-    * */
-/*
-    public void assemblePuzzles() throws MalformedURLException {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
-        //accept list of files
-        URL imageUrl = new URL("https://i.imgur.com/EfVO4jw.jpeg");
-        List<File> fileList = split(imageUrl);
-        File[] puzzleFiles = fileList.toArray(new File[0]);
-        try {
-
-            // Step 0. Read images by OpenCV
-            List<Mat> imagePieces = loadAndPreprocessImages(puzzleFiles);
-
-            // Step 1. Determine the sequence of image pieces based on edge matching
-            List<Mat> assembledPieces = assembleImagePieces(imagePieces);
-
-            // Merge the image pieces
-            Mat assembledImage = mergeImagePieces(assembledPieces);
-
-            // Save the assembled image
-            String outputImagePath = "./assembled";
-            Imgcodecs.imwrite(outputImagePath, assembledImage);
-
-            System.out.println("Image assembled successfully!");
-        } catch (Exception e) {
-            System.out.println("Error occurred during image assembly: " + e.getMessage());
-        }
-    }*/
-
-    /*
-    *
-    *
-    * Test of Step 1. Determine the sequence of image pieces based on edge matching.
-    * Expected: the sequence of mat files should match the sequence of the source image pieces.
-    *
-    * */
-
-
     public List<BufferedImage> getPiecesOrderedByOpenCV() throws MalformedURLException {
 
         String nativeLibrariesPath = "native-libraries/";
@@ -186,7 +143,6 @@ public class ImageService implements CommandLineRunner {
         } catch (Exception e) {
             System.out.println("Error occurred during image assembly: " + e.getMessage());
         }
-        // convert list of Mat into list of BufferedImages
         List<BufferedImage> bufferedImages = assembledPieces.stream()
                 .map(mat -> ImageConverter.convertMatToBufferedImage(mat))
                 .collect(Collectors.toList());
@@ -217,26 +173,17 @@ public class ImageService implements CommandLineRunner {
 
     private static List<Mat> assembleImagePieces(List<Mat> imagePieces) {
         List<Mat> assembledPieces = new ArrayList<>();
-
-        // Start with the first image piece
         Mat firstPiece = imagePieces.get(0);
         assembledPieces.add(firstPiece);
         imagePieces.remove(0);
-
         while (!imagePieces.isEmpty()) {
             Mat previousPiece = assembledPieces.get(assembledPieces.size() - 1);
             Mat bestMatch = null;
             double bestMatchScore = Double.MAX_VALUE;
-
-            // Get the border pixels from the previous piece
             Mat previousBorderPixels = extractBorderPixels(previousPiece, BorderType.RIGHT);
-
-            // Iterate over the remaining image pieces to find the best matching piece
             for (Mat currentPiece : imagePieces) {
-                // Get the border pixels from the current piece
                 Mat currentBorderPixels = extractBorderPixels(currentPiece, BorderType.LEFT);
 
-                // Calculate the similarity score for the border pixels
                 double score = calculateMatchingScore(previousBorderPixels, currentBorderPixels);
 
                 if (score < bestMatchScore) {
@@ -244,12 +191,10 @@ public class ImageService implements CommandLineRunner {
                     bestMatch = currentPiece;
                 }
             }
-
             if (bestMatch != null) {
                 assembledPieces.add(bestMatch);
                 imagePieces.remove(bestMatch);
             } else {
-                // If no match is found, break the loop
                 break;
             }
         }
@@ -260,16 +205,13 @@ public class ImageService implements CommandLineRunner {
     private static Mat extractBorderPixels(Mat image, BorderType borderType) {
         int rows = image.rows();
         int cols = image.cols();
-        int borderSize = 1; // Number of pixels on the border to extract
-
-        // Extract the border pixels based on the border type
+        int borderSize = 1;
         Mat borderPixels = new Mat();
         if (borderType == BorderType.LEFT) {
             borderPixels = new Mat(image, new Rect(0, 0, borderSize, rows));
         } else if (borderType == BorderType.RIGHT) {
             borderPixels = new Mat(image, new Rect(cols - borderSize, 0, borderSize, rows));
         }
-
         return borderPixels;
     }
 
@@ -283,7 +225,6 @@ public class ImageService implements CommandLineRunner {
                 sumSquaredDiff += Math.pow(diff, 2);
             }
         }
-
         return sumSquaredDiff / totalPixels;
     }
 
@@ -293,16 +234,10 @@ public class ImageService implements CommandLineRunner {
     }
 
     private static Mat mergeImagePieces(List<Mat> assembledPieces) {
-        // Implement the image merging logic here
-        // ...
-
-        // Placeholder code: Just concatenate the image pieces horizontally
         Mat assembledImage = new Mat();
         Core.hconcat(assembledPieces, assembledImage);
-
         return assembledImage;
     }
-
 
     @Override
     public void run(String... args) throws Exception {
