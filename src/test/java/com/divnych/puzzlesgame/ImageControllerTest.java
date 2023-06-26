@@ -35,18 +35,30 @@ public class ImageControllerTest {
 
     @Test
     @DisplayName("Should return a list of images decoded in strings")
-    void testSplit()  {
-            ImageUrlRequest request = new ImageUrlRequest();
-            request.setImageUrl("http://example.com/image.jpg");
-            List<String> expectedResult = Arrays.asList("string1", "string2", "string3");
-            when(imageService.getEncodedImages(any())).thenReturn(expectedResult);
-            ObjectMapper objectMapper = new ObjectMapper();
+    void testSplit() {
+        ImageUrlRequest request = new ImageUrlRequest();
+        request.setImageUrl("https://i.imgur.com/EfVO4jw.jpeg");
+        List<String> expectedResult = Arrays.asList("string1", "string2", "string3");
+        when(imageService.getEncodedImages(any())).thenReturn(expectedResult);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestJson = encodeImagesToStrings(request, objectMapper);
+        MvcResult mvcResult = createImageFiles(requestJson);
+        String responseBody = convertImageFilesToStrings(mvcResult);
+        List<String> actualResult = readStrings(objectMapper, responseBody);
+        assertEquals(expectedResult, actualResult);
+    }
+
+    private String encodeImagesToStrings(ImageUrlRequest request, ObjectMapper objectMapper) {
         String requestJson;
         try {
             requestJson = objectMapper.writeValueAsString(request);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+        return requestJson;
+    }
+
+    private MvcResult createImageFiles(String requestJson) {
         MvcResult mvcResult;
         try {
             mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/images/split")
@@ -57,19 +69,27 @@ public class ImageControllerTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return mvcResult;
+    }
+
+    private static String convertImageFilesToStrings(MvcResult mvcResult) {
         String responseBody;
         try {
             responseBody = mvcResult.getResponse().getContentAsString();
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+        return responseBody;
+    }
+
+    private static List<String> readStrings(ObjectMapper objectMapper, String responseBody) {
         List<String> actualResult;
         try {
             actualResult = objectMapper.readValue(responseBody, List.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-         assertEquals(expectedResult, actualResult);
+        return actualResult;
     }
 
 }
