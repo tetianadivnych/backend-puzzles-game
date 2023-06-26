@@ -2,8 +2,6 @@ package com.divnych.puzzlesgame.service;
 
 import com.divnych.puzzlesgame.converter.ImageConverter;
 import com.divnych.puzzlesgame.exceptions.FailedToCreateDirectoryException;
-import com.divnych.puzzlesgame.exceptions.FailedToOpenStreamException;
-import com.divnych.puzzlesgame.exceptions.FailedToReadImageException;
 import com.divnych.puzzlesgame.exceptions.InvalidImageUrlException;
 import com.divnych.puzzlesgame.playload.ImageUrlRequest;
 import org.opencv.core.Core;
@@ -13,8 +11,6 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
@@ -38,36 +34,14 @@ public class ImageService implements CommandLineRunner {
 
     public List<File> split(URL imageUrl) {
         System.setProperty("http.agent", "Chrome");
-        InputStream inputStream;
-        try {
-            inputStream = imageUrl.openStream();
-        } catch (IOException e) {
-            throw new FailedToOpenStreamException("Cannot open stream for URL" + imageUrl);
-        }
-        BufferedImage inputImage;
-        try {
-            inputImage = ImageIO.read(inputStream);
-        } catch (IOException e) {
-            throw new FailedToReadImageException("Cannot read input image");
-        }
+        InputStream inputStream = ImageConverter.getInputImageStream(imageUrl);
+        BufferedImage inputImage = ImageConverter.convertStreamToBufferedImage(inputStream);
         int rows = 4;
         int columns = 4;
         BufferedImage[] puzzleImages = new BufferedImage[rows*columns];
         int width = inputImage.getWidth() / columns;
         int height = inputImage.getHeight() / rows;
-        int currentImage = 0;
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                puzzleImages[currentImage] = new BufferedImage(width, height, inputImage.getType());
-                Graphics2D img_creator = puzzleImages[currentImage].createGraphics();
-                int src_first_x = width * j;
-                int src_first_y = height * i;
-                int dst_corner_x = width * j + width;
-                int dst_corner_y = height * i + height;
-                img_creator.drawImage(inputImage, 0, 0, width, height, src_first_x, src_first_y, dst_corner_x, dst_corner_y, null);
-                currentImage++;
-            }
-        }
+        ImageConverter.divideImageIntoPieces(inputImage, rows, columns, puzzleImages, width, height);
         String sourcePuzzlesDirectoryPath = "./puzzles/";
         createDirectory(sourcePuzzlesDirectoryPath);
         return ImageConverter.convertBufferedImagesToFiles(puzzleImages, sourcePuzzlesDirectoryPath);
@@ -128,11 +102,9 @@ public class ImageService implements CommandLineRunner {
     }
 
     public List<BufferedImage> getPiecesOrderedByOpenCV() throws MalformedURLException {
-
         String nativeLibrariesPath = "native-libraries/";
         System.setProperty("java.library.path", nativeLibrariesPath);
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
         URL imageUrl = new URL("https://i.imgur.com/EfVO4jw.jpeg");
         List<File> fileList = split(imageUrl);
         File[] puzzleFiles = fileList.toArray(new File[0]);
@@ -239,9 +211,14 @@ public class ImageService implements CommandLineRunner {
         return assembledImage;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public void placePiecesOrderedByOpenCV() throws MalformedURLException {
         List<BufferedImage> piecesOrderedByOpenCV = getPiecesOrderedByOpenCV();
         saveAssembledImagesToDirectory(piecesOrderedByOpenCV);
     }
+
+    @Override
+    public void run(String... args) throws Exception {
+        placePiecesOrderedByOpenCV();
+    }
+
 }
